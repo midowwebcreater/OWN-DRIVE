@@ -3,382 +3,379 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Own-n-Drive — by GAD CAPITAL</title>
+  <title>Own-n-Drive — Full Ready (GAD CAPITAL)</title>
   <link rel="icon" href="assets/favicon.png" />
-
-  <!-- Tailwind Play CDN (no build step needed) -->
+  <meta name="description" content="Own-n-Drive — fractional car ownership platform. Demo with optional Firebase Auth, Firestore & Storage integration." />
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            navy: '#0A1930',
-            accent: '#FFC818',
-            muted: '#6B7280',
-            glass: 'rgba(255,255,255,0.04)'
-          },
-          keyframes: {
-            floatX: {
-              '0%': { transform: 'translateX(0) translateY(0) rotate(0deg)' },
-              '50%': { transform: 'translateX(-8px) translateY(-4px) rotate(-1deg)' },
-              '100%': { transform: 'translateX(0) translateY(0) rotate(0deg)' }
-            },
-            drift: {
-              '0%': { transform: 'translateX(-20%)' },
-              '100%': { transform: 'translateX(120%)' }
-            },
-            pulseAccent: {
-              '0%': { boxShadow: '0 0 0 0 rgba(255,200,24,0.12)' },
-              '70%': { boxShadow: '0 0 0 18px rgba(255,200,24,0)' },
-              '100%': { boxShadow: '0 0 0 0 rgba(255,200,24,0)' }
-            }
-          },
-          animation: {
-            floatX: 'floatX 4s ease-in-out infinite',
-            drift: 'drift 28s linear infinite',
-            pulseAccent: 'pulseAccent 2.2s infinite'
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    /* Extra custom for premium look */
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-    /* Animated auto-stripe background (SVG repeated) */
-    .auto-bg {
-      position: fixed; inset: 0; z-index: -10; overflow: hidden; pointer-events: none;
-      background: radial-gradient(circle at 10% 10%, rgba(255,200,24,0.04), transparent 6%),
-                  linear-gradient(180deg, rgba(10,25,48,0.03), rgba(255,255,255,0.02));
-      backdrop-filter: blur(2px);
-    }
-    .auto-track {
-      position:absolute; left:-40%; top:40%; width:200%; height:220px; opacity:0.06;
-      background-repeat:no-repeat; background-size:contain;
-      background-image:
-        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="220"><defs/><g fill="%230a1930" fill-opacity="0.08"><rect x="0" y="60" width="1000" height="10" rx="6"/><rect x="1200" y="40" width="400" height="10" rx="6"/></g><g fill="%23FFC818" fill-opacity="0.06"><circle cx="80" cy="40" r="3"/></g></svg>');
-      animation: drift 28s linear infinite;
-      transform: translate3d(0,0,0);
-    }
-    /* subtle glass panel */
-    .glass {
-      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.6));
-      border: 1px solid rgba(10,25,48,0.06);
-      backdrop-filter: blur(6px);
-    }
-    /* floating car SVG */
-    .car-hero svg { filter: drop-shadow(0 18px 40px rgba(10,25,48,0.12)); }
-    /* testimonial star */
-    .star { color: #FFC818; }
-    /* responsive hide for heavy visuals on small */
-    @media (max-width:640px) { .auto-track { display:none } }
+    /* Minor custom styles */
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: linear-gradient(180deg,#f7fbff 0%, #fff 100%); color:#0b1220; -webkit-font-smoothing:antialiased; }
+    .glass { background: rgba(255,255,255,0.78); border:1px solid rgba(10,25,48,0.06); backdrop-filter: blur(6px); }
+    .card-hover:hover{ transform: translateY(-8px); transition: transform .28s ease; box-shadow: 0 24px 48px rgba(10,25,48,0.08); }
+    .modal-backdrop{ background: rgba(2,6,23,0.6); backdrop-filter: blur(3px); }
+    .soft-shadow{ box-shadow: 0 12px 40px rgba(10,25,48,0.08); }
+    @media (max-width:760px) { .desktop-only{ display:none } }
   </style>
 </head>
-<body class="bg-gradient-to-b from-slate-50 to-white text-slate-900">
+<body class="antialiased">
 
-  <!-- Animated background -->
-  <div class="auto-bg">
-    <div class="auto-track"></div>
-  </div>
-
-  <!-- Header -->
-  <header class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+  <!-- HEADER -->
+  <header class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <img src="assets/logo.png" alt="Own-n-Drive logo" class="h-12 w-auto" />
+      <img src="assets/logo.png" alt="Own-n-Drive" class="h-12" onerror="this.style.display='none'"/>
       <div>
         <div class="text-lg font-extrabold">Own-n-Drive</div>
-        <div class="text-xs text-slate-500">by GAD CAPITAL</div>
+        <div class="text-xs text-gray-500">by GAD CAPITAL</div>
       </div>
     </div>
-    <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
-      <a href="#how" class="hover:text-navy">How it works</a>
-      <a href="#cars" class="hover:text-navy">Vehicles</a>
-      <a href="#pricing" class="hover:text-navy">Pricing</a>
-      <a href="#contact" class="hover:text-navy">Contact</a>
-      <button class="ml-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy text-white font-semibold shadow hover:scale-105 transform transition">Request Callback</button>
-    </nav>
-    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg border"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg></button>
+
+    <div class="flex items-center gap-3">
+      <nav class="hidden md:flex gap-6 text-sm text-gray-700">
+        <a href="#cars" class="hover:text-navy">Vehicles</a>
+        <a href="#pricing" class="hover:text-navy">Pricing</a>
+        <a href="#contact" class="hover:text-navy">Contact</a>
+      </nav>
+
+      <div id="authControls" class="flex items-center gap-3">
+        <button id="btnLogin" class="px-4 py-2 rounded-lg border">Login</button>
+        <button id="btnSignup" class="px-4 py-2 rounded-lg bg-navy text-white">Sign up</button>
+      </div>
+
+      <div id="userControls" class="hidden items-center gap-3">
+        <span id="headerUserName" class="text-sm font-semibold"></span>
+        <button id="btnOpenDashboard" class="px-3 py-2 rounded-lg border">Dashboard</button>
+        <button id="btnLogout" class="px-3 py-2 rounded-lg">Logout</button>
+      </div>
+    </div>
   </header>
 
   <!-- HERO -->
-  <section class="max-w-7xl mx-auto px-6 grid gap-8 md:grid-cols-2 items-center py-12">
-    <div class="space-y-6">
-      <span class="inline-block bg-accent text-navy font-bold px-3 py-1 rounded-full">Premium • Fractional Ownership</span>
-      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Own the Car, Share the Cost — Drive Premium</h1>
-      <p class="text-slate-600 max-w-xl">Form a group, buy the car via SPV, split the total cost and enjoy a managed ownership experience — insurance, maintenance, scheduling and resale handled by GAD CAPITAL.</p>
+  <section class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center py-12 relative">
+    <div>
+      <span class="inline-block bg-yellow-400 text-navy px-3 py-1 rounded-full font-bold text-sm">Premium • Fractional Ownership</span>
+      <h1 class="mt-4 text-4xl md:text-5xl font-extrabold leading-tight">Own the Car — Split the Cost — Drive Premium</h1>
+      <p class="mt-4 text-gray-600 max-w-lg">Form a group, create an SPV, split equity and enjoy a managed ownership experience — insurance, maintenance, scheduling and resale handled by GAD CAPITAL.</p>
 
-      <div class="flex gap-3 items-center">
-        <a href="#cars" class="inline-flex items-center gap-3 bg-navy text-white px-6 py-3 rounded-xl font-bold shadow hover:opacity-95 transition">
-          Browse Vehicles
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-        </a>
-
-        <a href="#pricing" class="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition">
-          View Pricing
-        </a>
-
-        <div class="ml-4 inline-flex items-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow animate-pulseAccent">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-navy" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h18M3 12h18M5 19h14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="text-sm text-slate-600">
-            <div class="font-semibold">Trusted process</div>
-            <div>Transparent cost splits • 5-year maintenance</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2 text-sm text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 17l-5 3 1-6-4-4 6-1 3-5 3 5 6 1-4 4 1 6z" stroke-width="1.5"/></svg>
-        <div>As seen on trusted partners • Managed by GAD CAPITAL</div>
+      <div class="mt-6 flex gap-3">
+        <button id="ctaBrowse" class="px-6 py-3 rounded-lg bg-navy text-white font-bold shadow">Browse Vehicles</button>
+        <button id="ctaPricing" class="px-6 py-3 rounded-lg border">View Pricing</button>
       </div>
     </div>
 
-    <!-- Hero visual: animated car silhouette -->
-    <div class="car-hero relative">
-      <div class="glass rounded-2xl p-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-sm text-slate-500">Featured</div>
-            <div class="text-2xl font-bold">Kia Seltos • Creta • Nexon</div>
-            <div class="text-sm text-slate-500 mt-1">Curated models under ₹20L — with 5-year maintenance</div>
-          </div>
-          <div class="text-right">
-            <div class="text-xs text-slate-400">Starting from</div>
-            <div class="text-xl font-extrabold text-navy">₹5L</div>
-          </div>
+    <div class="glass p-6 rounded-3xl soft-shadow">
+      <!-- Animated car SVG (decorative) -->
+      <svg viewBox="0 0 900 420" class="w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+        <defs>
+          <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#FFC818"/><stop offset="1" stop-color="#FF9A08"/></linearGradient>
+          <linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#0A1930"/><stop offset="1" stop-color="#122b54"/></linearGradient>
+        </defs>
+        <ellipse cx="450" cy="360" rx="260" ry="28" fill="rgba(10,25,48,0.06)" />
+        <g transform="translate(60,60)">
+          <g style="animation: transform 4s ease-in-out infinite;">
+            <rect x="60" y="90" rx="32" ry="32" width="680" height="120" fill="url(#g2)" opacity="0.95"/>
+            <path d="M0 110 Q60 40 180 40 L640 40 Q760 40 820 110 L820 170 Q760 210 640 210 L180 210 Q60 210 0 170Z" fill="url(#g1)" opacity="0.14"/>
+          </g>
+        </g>
+      </svg>
+
+      <div class="mt-6 grid grid-cols-2 gap-3">
+        <div class="p-3 bg-white rounded-lg text-center">
+          <div class="text-xs text-gray-500">Equity</div><div class="font-bold">20%</div>
         </div>
-
-        <div class="mt-6 flex gap-4 items-center">
-          <div class="h-44 w-full rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden">
-            <!-- Main car image (use provided assets or placeholder) -->
-            <img src="assets/placeholder-car.png" alt="car" class="max-h-full object-contain" id="heroCarImg" />
-          </div>
-
-          <div class="w-40 flex flex-col gap-3">
-            <div class="bg-white p-3 rounded-lg shadow text-center">
-              <div class="text-xs text-slate-400">Equity required</div>
-              <div class="text-lg font-bold">20% (example)</div>
-            </div>
-            <div class="bg-white p-3 rounded-lg shadow text-center">
-              <div class="text-xs text-slate-400">Group size</div>
-              <div class="text-lg font-bold">5 members</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- animated small car icons drifting in the background -->
-        <div class="absolute -bottom-6 left-6 opacity-40" style="transform: translateZ(0);">
-          <svg width="220" height="60" viewBox="0 0 220 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="animate-drift">
-            <rect width="220" height="60" rx="14" fill="url(#g)"/>
-            <defs><linearGradient id="g" x1="0" x2="220" y1="0" y2="60"><stop offset="0" stop-color="#FFC818" stop-opacity="0.06"/><stop offset="1" stop-color="#0A1930" stop-opacity="0.02"/></linearGradient></defs>
-          </svg>
+        <div class="p-3 bg-white rounded-lg text-center">
+          <div class="text-xs text-gray-500">Group Size</div><div class="font-bold">5 members</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- How it works -->
-  <section id="how" class="max-w-7xl mx-auto px-6 py-12">
-    <h2 class="text-3xl font-extrabold text-center mb-8">How it works — Simple & Transparent</h2>
-    <div class="grid md:grid-cols-4 gap-6">
-      <div class="glass p-6 rounded-2xl text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-navy text-white mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h18M3 12h18M5 19h14" stroke-width="1.5"/></svg>
-        </div>
-        <h4 class="font-bold">1. Pick a model</h4>
-        <p class="text-sm text-slate-500 mt-2">Choose from curated vehicles under your budget.</p>
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-6">
+    <!-- Vehicles -->
+    <section id="cars" class="py-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold">Vehicles — Telangana On-Road</h2>
+        <div class="text-sm text-gray-500">Admin can manage vehicles from Dashboard</div>
       </div>
-      <div class="glass p-6 rounded-2xl text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-navy text-white mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v8M8 12h8" stroke-width="1.5"/></svg>
-        </div>
-        <h4 class="font-bold">2. Form group</h4>
-        <p class="text-sm text-slate-500 mt-2">Group of 5 forms an SPV — equity split documented.</p>
+      <div id="vehicleGrid" class="grid md:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-8">
+      <h3 class="text-2xl font-bold mb-4">Telangana — On-Road Pricing (5Y maintenance incl.)</h3>
+      <div class="overflow-x-auto glass rounded-lg p-4">
+        <table class="w-full text-left">
+          <thead><tr class="text-sm text-gray-500"><th>#</th><th>Model</th><th>On-Road (₹)</th><th>5Y Maint (₹)</th><th>Total (₹)</th><th>Per Member (₹)</th></tr></thead>
+          <tbody id="pricingTable" class="text-sm text-gray-700"></tbody>
+        </table>
       </div>
-      <div class="glass p-6 rounded-2xl text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-navy text-white mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h18M3 12h18M5 19h14" stroke-width="1.5"/></svg>
-        </div>
-        <h4 class="font-bold">3. Schedule & Drive</h4>
-        <p class="text-sm text-slate-500 mt-2">Book transparent slots. No conflicts. Reminders sent.</p>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-8">
+      <div class="glass p-6 rounded-2xl">
+        <h3 class="text-xl font-bold mb-3">Request a callback</h3>
+        <form id="leadForm" class="grid gap-3 md:grid-cols-2">
+          <input name="name" placeholder="Full name" class="p-3 border rounded" required />
+          <input name="phone" placeholder="Phone" class="p-3 border rounded" required />
+          <input name="email" placeholder="Email (optional)" class="p-3 border rounded" />
+          <select name="model" class="p-3 border rounded">
+            <option value="">Model of interest (optional)</option>
+            <option>Maruti Alto K10</option><option>Kia Sonet</option><option>Tata Nexon</option><option>Hyundai i20</option>
+          </select>
+          <div class="md:col-span-2 flex gap-3">
+            <button type="submit" class="px-4 py-3 rounded-lg bg-navy text-white">Submit</button>
+            <button type="button" id="downloadLeadsCSV" class="px-4 py-3 rounded-lg border">Download CSV</button>
+          </div>
+          <div id="leadMsg" class="md:col-span-2 text-green-600 font-semibold"></div>
+        </form>
       </div>
-      <div class="glass p-6 rounded-2xl text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-navy text-white mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M12 5v14" stroke-width="1.5"/></svg>
-        </div>
-        <h4 class="font-bold">4. Exit or Resell</h4>
-        <p class="text-sm text-slate-500 mt-2">GAD CAPITAL handles resale and proceeds distribution.</p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto px-6 py-8 text-sm text-gray-600">
+    <div class="flex items-center justify-between">
+      <div>© <span id="year"></span> GAD CAPITAL — Own-n-Drive</div>
+      <div class="flex gap-4">
+        <a href="#" id="adminLink">Admin</a>
+        <a href="#" id="devLink">Dev</a>
       </div>
     </div>
-  </section>
+  </footer>
 
-  <!-- Vehicles grid -->
-  <section id="cars" class="max-w-7xl mx-auto px-6 py-12">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-2xl font-bold">Vehicles — Telangana On-Road</h3>
-      <div class="flex gap-3">
-        <button class="px-4 py-2 rounded-lg border">Filter</button>
-        <button class="px-4 py-2 rounded-lg bg-navy text-white">Sort: Popular</button>
-      </div>
-    </div>
+  <!-- Modal root & dashboard shell -->
+  <div id="modalRoot"></div>
 
-    <div class="grid md:grid-cols-3 gap-6">
-      <!-- Card template repeated for each vehicle -->
-      <!-- 1 -->
-      <article class="card glass p-5 rounded-2xl">
-        <div class="relative">
-          <img src="assets/alto.png" onerror="this.src='assets/placeholder-car.png'" alt="Alto" class="w-full h-44 object-contain" />
-          <div class="absolute top-4 left-4 bg-white/80 px-3 py-1 rounded-full text-xs font-semibold">Share 1/5</div>
-        </div>
-        <div class="mt-4">
-          <div class="flex items-center justify-between">
+  <div id="dashboard" class="fixed inset-0 z-50 hidden">
+    <div class="modal-backdrop absolute inset-0"></div>
+    <div class="relative max-w-6xl mx-auto p-6">
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden grid md:grid-cols-4" style="min-height:70vh">
+        <aside class="p-6 border-r">
+          <div class="flex items-center gap-3 mb-6">
+            <img src="assets/logo.png" class="h-10" onerror="this.style.display='none'"/>
             <div>
-              <div class="font-bold text-lg">Maruti Alto K10</div>
-              <div class="text-xs text-slate-500">Variant: Base • 5 seats</div>
-            </div>
-            <div class="text-right">
-              <div class="text-navy font-extrabold">₹5,42,640</div>
-              <div class="text-xs text-slate-500">On-road</div>
+              <div id="sideName" class="font-bold"></div>
+              <div id="sideRole" class="text-xs text-gray-500"></div>
             </div>
           </div>
+          <nav class="space-y-2">
+            <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-50 dash-tab" data-tab="overview">Overview</button>
+            <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-50 dash-tab" data-tab="leads">Leads</button>
+            <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-50 dash-tab" data-tab="vehicles">Vehicles</button>
+            <button class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-50 dash-tab" data-tab="updates">Daily Updates</button>
+            <button id="devTab" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-50 dash-tab hidden" data-tab="dev">Developer</button>
+            <div class="mt-6">
+              <button id="closeDashboard" class="w-full px-3 py-2 rounded-md bg-navy text-white">Close</button>
+              <button id="logoutDashboard" class="w-full mt-2 px-3 py-2 rounded-md border">Logout</button>
+            </div>
+          </nav>
+        </aside>
+        <main id="dashContent" class="md:col-span-3 p-6 overflow-auto"></main>
+      </div>
+    </div>
+  </div>
 
-          <div class="mt-3 flex items-center justify-between">
-            <div class="text-sm text-slate-500">5Y Maint: ₹65,000</div>
-            <div class="text-sm font-semibold">Total: ₹6,07,640</div>
+  <!-- FIREBASE + APP LOGIC -->
+  <script type="module">
+    /* =========================
+       Firebase-ready front-end
+       - Paste your firebaseConfig below to enable live mode
+       - If firebaseConfig remains null => localStorage demo mode runs
+       ========================= */
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref as sref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // ---------- PASTE FIREBASE CONFIG OBJECT HERE ----------
+    // Example:
+    // const firebaseConfig = {
+    //   apiKey: "YOUR_KEY",
+    //   authDomain: "YOUR_PROJECT.firebaseapp.com",
+    //   projectId: "YOUR_PROJECT",
+    //   storageBucket: "YOUR_PROJECT.appspot.com",
+    //   messagingSenderId: "SENDER_ID",
+    //   appId: "APP_ID"
+    // };
+    const firebaseConfig = null; // <-- replace null with your config to enable Firebase
+
+    // ---------- Init ----------
+    let demoLocal = true;
+    let app, auth, db, storage;
+    if (firebaseConfig) {
+      try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        storage = getStorage(app);
+        demoLocal = false;
+        console.log("Firebase initialized — live mode");
+      } catch (err) {
+        console.error("Firebase initialization failed — falling back to local demo:", err);
+        demoLocal = true;
+      }
+    } else {
+      console.log("No Firebase config — running in local demo mode.");
+    }
+
+    // ---------- Utilities ----------
+    const uid = () => 'u_' + Math.random().toString(36).slice(2,9);
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => Array.from((ctx||document).querySelectorAll(sel));
+
+    // ---------- Local demo seeds ----------
+    function seedLocal() {
+      if (!localStorage.getItem('od_users')) {
+        const admin = { id: uid(), name: 'Admin', email: 'admin@ownndrive.com', password: 'admin123', role: 'admin' };
+        const dev = { id: uid(), name: 'Dev', email: 'dev@ownndrive.com', password: 'dev123', role: 'dev' };
+        const user = { id: uid(), name: 'Test User', email: 'user@ownndrive.com', password: 'user123', role: 'user' };
+        localStorage.setItem('od_users', JSON.stringify([admin, dev, user]));
+      }
+      if (!localStorage.getItem('od_vehicles')) {
+        const vehicles = [
+{ id:1, model:"Maruti Alto K10", onRoad:"5,42,640", maint:"65,000", total:"6,07,640", perMember:"1,51,910", image:"assets/alto.png" },
+{ id:2, model:"Renault Kwid", onRoad:"5,37,840", maint:"65,000", total:"6,02,840", perMember:"1,50,710", image:"assets/kwid.png" },
+{ id:3, model:"Maruti S-Presso", onRoad:"4,79,360", maint:"65,000", total:"5,44,360", perMember:"1,36,090", image:"assets/spresso.png" },
+{ id:4, model:"Tata Tiago", onRoad:"7,67,200", maint:"65,000", total:"8,32,200", perMember:"2,08,050", image:"assets/tiago.png" },
+{ id:5, model:"Hyundai Grand i10 Nios", onRoad:"7,15,150", maint:"65,000", total:"7,80,150", perMember:"1,95,038", image:"assets/nios.png" },
+{ id:6, model:"Maruti Swift", onRoad:"8,20,630", maint:"65,000", total:"8,85,630", perMember:"2,21,408", image:"assets/swift.png" },
+{ id:7, model:"Maruti Baleno", onRoad:"9,05,570", maint:"65,000", total:"9,70,570", perMember:"2,42,643", image:"assets/baleno.png" },
+{ id:8, model:"Tata Punch", onRoad:"8,22,000", maint:"65,000", total:"8,87,000", perMember:"2,21,750", image:"assets/punch.png" },
+{ id:9, model:"Kia Sonet", onRoad:"11,94,630", maint:"65,000", total:"12,59,630", perMember:"3,14,908", image:"assets/sonet.png" },
+{ id:10, model:"Tata Nexon", onRoad:"12,33,000", maint:"65,000", total:"12,98,000", perMember:"3,24,500", image:"assets/nexon.png" },
+{ id:11, model:"Hyundai i20", onRoad:"10,27,500", maint:"65,000", total:"10,92,500", perMember:"2,73,125", image:"assets/i20.png" }
+        ];
+        localStorage.setItem('od_vehicles', JSON.stringify(vehicles));
+      }
+      if (!localStorage.getItem('od_leads')) {
+        const leads = [ { id: uid(), name: "Rahul K", phone: "9876543210", model: "Kia Seltos", status: "new", created: Date.now() } ];
+        localStorage.setItem('od_leads', JSON.stringify(leads));
+      }
+      if (!localStorage.getItem('od_updates')) {
+        const updates = [ { id: uid(), title: "Fleet update: 5 new Nexons", image: '', text: "Added 5 Nexons in Hyderabad", date: Date.now() } ];
+        localStorage.setItem('od_updates', JSON.stringify(updates));
+      }
+    }
+    if (demoLocal) seedLocal();
+
+    // ---------- Data access layer: Firestore or local ----------
+    async function fetchVehicles() {
+      if (!demoLocal) {
+        const snap = await getDocs(collection(db, 'vehicles'));
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } else {
+        return JSON.parse(localStorage.getItem('od_vehicles') || '[]');
+      }
+    }
+    async function addVehicle(v) {
+      if (!demoLocal) {
+        const ref = await addDoc(collection(db, 'vehicles'), v); return { id: ref.id, ...v };
+      } else {
+        const vs = JSON.parse(localStorage.getItem('od_vehicles')||'[]'); v.id = Date.now(); vs.push(v); localStorage.setItem('od_vehicles', JSON.stringify(vs)); return v;
+      }
+    }
+    async function updateVehicle(id, patch) {
+      if (!demoLocal) {
+        await updateDoc(doc(db, 'vehicles', id), patch);
+      } else {
+        let vs = JSON.parse(localStorage.getItem('od_vehicles')||'[]'); vs = vs.map(x => x.id == id ? {...x, ...patch} : x); localStorage.setItem('od_vehicles', JSON.stringify(vs));
+      }
+    }
+    async function deleteVehicle(id) {
+      if (!demoLocal) await deleteDoc(doc(db, 'vehicles', id));
+      else { let vs = JSON.parse(localStorage.getItem('od_vehicles')||'[]'); vs = vs.filter(x => x.id != id); localStorage.setItem('od_vehicles', JSON.stringify(vs)); }
+    }
+
+    async function fetchLeads() {
+      if (!demoLocal) {
+        const snap = await getDocs(collection(db, 'leads')); return snap.docs.map(d=>({ id: d.id, ...d.data() })).sort((a,b)=>b.created-a.created);
+      } else return JSON.parse(localStorage.getItem('od_leads')||'[]');
+    }
+    async function addLead(lead) {
+      if (!demoLocal) {
+        const ref = await addDoc(collection(db, 'leads'), lead); return { id: ref.id, ...lead };
+      } else {
+        const leads = JSON.parse(localStorage.getItem('od_leads')||'[]'); lead.id = uid(); lead.created = Date.now(); leads.push(lead); localStorage.setItem('od_leads', JSON.stringify(leads)); return lead;
+      }
+    }
+
+    async function fetchUpdates() {
+      if (!demoLocal) {
+        const snap = await getDocs(collection(db, 'updates')); return snap.docs.map(d=>({ id:d.id, ...d.data() })).sort((a,b)=>b.date-a.date);
+      } else return JSON.parse(localStorage.getItem('od_updates')||'[]');
+    }
+    async function addUpdate(u) {
+      if (!demoLocal) {
+        const ref = await addDoc(collection(db, 'updates'), u); return { id: ref.id, ...u };
+      } else {
+        const ups = JSON.parse(localStorage.getItem('od_updates')||'[]'); u.id = uid(); u.date = Date.now(); ups.unshift(u); localStorage.setItem('od_updates', JSON.stringify(ups)); return u;
+      }
+    }
+
+    // ---------- Storage helper ----------
+    async function uploadImageToStorage(file, prefix='uploads') {
+      if (!demoLocal) {
+        const path = `${prefix}/${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+        const r = sref(storage, path);
+        await uploadBytes(r, file);
+        return await getDownloadURL(r);
+      } else {
+        // local demo -> data URL
+        return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(file); });
+      }
+    }
+
+    // ---------- Auth (local or Firebase) ----------
+    let currentUser = demoLocal ? JSON.parse(localStorage.getItem('od_currentUser') || 'null') : null;
+
+    async function signIn(email, password) {
+      if (!demoLocal) {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        // get user role from users collection
+        const q = query(collection(db, 'users'), where('email', '==', email));
+        const snap = await getDocs(q);
+        if (!snap.empty) { currentUser = { id: snap.docs[0].id, ...snap.docs[0].data() }; }
+        else currentUser = { id: cred.user.uid, email: cred.user.email, name: cred.user.email.split('@')[0], role: 'user' };
+        return currentUser;
+      } else {
+        const users = JSON.parse(localStorage.getItem('od_users')||'[]');
+        const u = users.find(x => x.email === email && x.password === password);
+        if (!u) throw new Error('Invalid credentials');
+        currentUser = u; localStorage.setItem('od_currentUser', JSON.stringify(u)); return u;
+      }
+    }
+
+    async function signUp(name, email, password, role='user') {
+      if (!demoLocal) {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        // store user doc with role
+        await setDoc(doc(db, 'users', cred.user.uid), { name, email, role });
+        currentUser = { id: cred.user.uid, name, email, role }; return currentUser;
+      } else {
+        const users = JSON.parse(localStorage.getItem('od_users')||'[]');
+        if (users.find(x => x.email === email)) throw new Error('Email exists');
+        const nu = { id: uid(), name, email, password, role }; users.push(nu); localStorage.setItem('od_users', JSON.stringify(users)); return nu;
+      }
+    }
+
+    async function doSignOut() {
+      if (!demoLocal) await signOut(auth);
+      currentUser = null; localStorage.removeItem('od_currentUser'); updateAuthUI();
+    }
+
+    // ---------- UI rendering ----------
+    async function renderVehicleGrid() {
+      const grid = $('#vehicleGrid'); grid.innerHTML = '';
+      const vehicles = await fetchVehicles();
+      vehicles.forEach(v => {
+        const card = document.createElement('article'); card.className = 'glass rounded-2xl p-5 card-hover';
+        card.innerHTML = `
+          <div class="relative">
+            <img src="${v.image || 'assets/placeholder-car.png'}" onerror="this.src='assets/placeholder-car.png'" class="w-full h-44 object-contain rounded-lg" alt="${v.model}" />
+            <div class="absolute top-4 left-4 bg-white/80 px-3 py-1 rounded-full text-xs font-semibold">Share 1/5</div>
           </div>
-
-          <div class="mt-4 flex items-center justify-between gap-3">
-            <div class="text-sm text-slate-600">Per member</div>
-            <div class="px-3 py-2 bg-accent text-navy rounded-xl font-bold">₹1,51,910</div>
-          </div>
-
-          <div class="mt-4 flex gap-3">
-            <button class="flex-1 px-4 py-2 rounded-lg border hover:shadow">Form Group</button>
-            <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 2 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/kwid.png" onerror="this.src='assets/placeholder-car.png'" alt="Kwid" class="w-full h-44 object-contain" />
-        <div class="mt-4 flex items-center justify-between">
-          <div>
-            <div class="font-bold">Renault Kwid</div>
-            <div class="text-xs text-slate-500">Variant: Base</div>
-          </div>
-          <div class="text-right font-extrabold text-navy">₹5,37,840</div>
-        </div>
-        <div class="mt-3 text-sm text-slate-500">Total: ₹6,02,840 • Per member ₹1,50,710</div>
-        <div class="mt-4 flex gap-3">
-          <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-          <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-        </div>
-      </article>
-
-      <!-- 3 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/spresso.png" onerror="this.src='assets/placeholder-car.png'" alt="S-Presso" class="w-full h-44 object-contain" />
-        <div class="mt-4">
-          <div class="flex items-center justify-between">
-            <div><div class="font-bold">Maruti S-Presso</div><div class="text-xs text-slate-500">Base</div></div>
-            <div class="text-navy font-extrabold">₹4,79,360</div>
-          </div>
-          <div class="mt-3 text-sm text-slate-500">Total: ₹5,44,360 • Per member ₹1,36,090</div>
-          <div class="mt-4 flex gap-3">
-            <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-            <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 4 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/tiago.png" onerror="this.src='assets/placeholder-car.png'" alt="Tiago" class="w-full h-44 object-contain" />
-        <div class="mt-4 flex items-center justify-between">
-          <div><div class="font-bold">Tata Tiago</div><div class="text-xs text-slate-500">Base</div></div>
-          <div class="text-navy font-extrabold">₹7,67,200</div>
-        </div>
-        <div class="mt-3 text-sm text-slate-500">Total: ₹8,32,200 • Per member ₹2,08,050</div>
-        <div class="mt-4 flex gap-3">
-          <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-          <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-        </div>
-      </article>
-
-      <!-- 5 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/nios.png" onerror="this.src='assets/placeholder-car.png'" alt="Nios" class="w-full h-44 object-contain" />
-        <div class="mt-4 flex items-center justify-between">
-          <div><div class="font-bold">Hyundai Grand i10 Nios</div><div class="text-xs text-slate-500">Base</div></div>
-          <div class="text-navy font-extrabold">₹7,15,150</div>
-        </div>
-        <div class="mt-3 text-sm text-slate-500">Total: ₹7,80,150 • Per member ₹1,95,038</div>
-        <div class="mt-4 flex gap-3">
-          <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-          <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-        </div>
-      </article>
-
-      <!-- 6 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/swift.png" onerror="this.src='assets/placeholder-car.png'" alt="Swift" class="w-full h-44 object-contain" />
-        <div class="mt-4 flex items-center justify-between">
-          <div><div class="font-bold">Maruti Swift</div><div class="text-xs text-slate-500">VXI</div></div>
-          <div class="text-navy font-extrabold">₹8,20,630</div>
-        </div>
-        <div class="mt-3 text-sm text-slate-500">Total: ₹8,85,630 • Per member ₹2,21,408</div>
-        <div class="mt-4 flex gap-3">
-          <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-          <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-        </div>
-      </article>
-
-      <!-- 7 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/baleno.png" onerror="this.src='assets/placeholder-car.png'" alt="Baleno" class="w-full h-44 object-contain" />
-        <div class="mt-4 flex items-center justify-between">
-          <div><div class="font-bold">Maruti Baleno</div><div class="text-xs text-slate-500">ZXi</div></div>
-          <div class="text-navy font-extrabold">₹9,05,570</div>
-        </div>
-        <div class="mt-3 text-sm text-slate-500">Total: ₹9,70,570 • Per member ₹2,42,643</div>
-        <div class="mt-4 flex gap-3">
-          <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-          <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-        </div>
-      </article>
-
-      <!-- 8 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/punch.png" onerror="this.src='assets/placeholder-car.png'" alt="Punch" class="w-full h-44 object-contain" />
-        <div class="mt-4 flex items-center justify-between">
-          <div><div class="font-bold">Tata Punch</div><div class="text-xs text-slate-500">XZ</div></div>
-          <div class="text-navy font-extrabold">₹8,22,000</div>
-        </div>
-        <div class="mt-3 text-sm text-slate-500">Total: ₹8,87,000 • Per member ₹2,21,750</div>
-        <div class="mt-4 flex gap-3">
-          <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-          <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-        </div>
-      </article>
-
-      <!-- 9 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/sonet.png" onerror="this.src='assets/placeholder-car.png'" alt="Sonet" class="w-full h-44 object-contain" />
-        <div class="mt-4 flex items-center justify-between">
-          <div><div class="font-bold">Kia Sonet</div><div class="text-xs text-slate-500">HTX</div></div>
-          <div class="text-navy font-extrabold">₹11,94,630</div>
-        </div>
-        <div class="mt-3 text-sm text-slate-500">Total: ₹12,59,630 • Per member ₹3,14,908</div>
-        <div class="mt-4 flex gap-3">
-          <button class="flex-1 px-4 py-2 rounded-lg border">Form Group</button>
-          <button class="px-4 py-2 rounded-lg bg-navy text-white">Book</button>
-        </div>
-      </article>
-
-      <!-- 10 -->
-      <article class="card glass p-5 rounded-2xl">
-        <img src="assets/nexon.png" onerror="this.src='assets/placeholder-car.png'" alt="Nexon" class="w-f
+          <div class="mt-4 flex items-center justify-between">
+           
